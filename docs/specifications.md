@@ -2,7 +2,7 @@
 
 ## 1. Descripción del proyecto
 
-TaskFlow es un sistema web de gestión de tareas que permite organizar actividades, registrar sus detalles y realizar un seguimiento de su estado. El proyecto se desarrollará utilizando Angular para el frontend, Node.js con Express para el backend y PostgreSQL para la base de datos.
+TaskFlow es un sistema web de gestión de tareas que permitirá organizar actividades, registrar sus detalles y realizar un seguimiento de su estado. El proyecto utiliza Angular y TypeScript para el frontend, Tailwind CSS para los estilos, Node.js con Express y TypeScript para el backend, y PostgreSQL para la base de datos.
 
 ## 2. Problema identificado
 
@@ -29,15 +29,18 @@ Desarrollar un sistema web que permita registrar, consultar, actualizar y elimin
 - RF-07: El sistema permitirá identificar las tareas vencidas.
 - RF-08: El sistema mostrará mensajes de confirmación o error en las operaciones principales.
 
+**Estado:** requisitos definidos; su implementación se realizará progresivamente durante el desarrollo.
+
 ## 6. Requisitos no funcionales
 
-- RNF-01: La interfaz será clara, adaptable y fácil de utilizar.
+- RNF-01: La interfaz será clara, adaptable y fácil de utilizar. Se utilizará Tailwind CSS para construir los estilos.
 - RNF-02: El backend validará los datos recibidos antes de procesarlos.
 - RNF-03: La información se almacenará en PostgreSQL.
 - RNF-04: El código fuente se gestionará mediante Git y GitHub.
 - RNF-05: Los cambios se organizarán mediante ramas y Pull Requests.
-- RNF-06: GitHub Actions ejecutará comprobaciones automatizadas del proyecto.
+- RNF-06: GitHub Actions ejecutará comprobaciones automatizadas del proyecto cuando se configure el flujo de integración continua.
 - RNF-07: Las credenciales y variables sensibles no se incluirán en el repositorio.
+- RNF-08: El frontend se desarrollará con Angular y TypeScript, utilizando componentes standalone y servicios para la comunicación con la API.
 
 ## 7. Reglas de negocio
 
@@ -48,6 +51,8 @@ Desarrollar un sistema web que permita registrar, consultar, actualizar y elimin
 - RN-05: No se permitirá registrar tareas con título vacío.
 - RN-06: Las tareas vencidas se identificarán comparando su fecha de vencimiento con la fecha actual, siempre que no estén completadas.
 
+Estas reglas deberán aplicarse y comprobarse en las funcionalidades correspondientes.
+
 ## 8. Criterios de aceptación
 
 - CA-01: Una tarea válida podrá registrarse y aparecer en el listado.
@@ -57,15 +62,27 @@ Desarrollar un sistema web que permita registrar, consultar, actualizar y elimin
 - CA-05: Las pruebas automatizadas comprobarán las operaciones principales.
 - CA-06: Los cambios enviados mediante Pull Requests deberán revisarse antes de integrarse a la rama principal.
 
+Los criterios se considerarán cumplidos cuando existan pruebas o evidencias que permitan verificar su funcionamiento.
+
 ## 9. Fuera del alcance inicial
 
 La primera versión no incluirá notificaciones por correo, aplicaciones móviles nativas, colaboración en tiempo real ni integración con calendarios externos.
 
-## 10. Tecnologías previstas
+## 10. Tecnologías previstas y seleccionadas
 
-- Frontend: Angular y TypeScript.
+- Frontend: Angular 22 y TypeScript.
+- Estilos del frontend: Tailwind CSS v4.
 - Backend: Node.js, Express y TypeScript.
+- Acceso a PostgreSQL: paquete `pg`.
 - Base de datos: PostgreSQL.
 - Control de versiones y colaboración: Git y GitHub.
 - Automatización: GitHub Actions.
 - Pruebas: herramientas compatibles con las tecnologías seleccionadas.
+
+## 11. Estado inicial de implementación
+
+- Entorno Angular configurado.
+- Backend Express iniciado.
+- Conexión con PostgreSQL comprobada mediante el endpoint de salud.
+- Endpoints iniciales de comprobación del servicio disponibles.
+- Funcionalidades de gestión de tareas pendientes de implementar y validar.
