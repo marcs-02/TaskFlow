@@ -1,0 +1,283 @@
+﻿
+<div class="min-h-screen bg-slate-50 text-slate-800">
+  <div class="flex min-h-screen">
+    <aside class="hidden w-64 shrink-0 border-r border-slate-200 bg-white p-6 md:block">
+      <div class="mb-10 flex items-center gap-3">
+        <div class="flex h-11 w-11 items-center justify-center rounded-xl bg-indigo-600 text-xl font-bold text-white">T</div>
+        <div>
+          <h1 class="text-xl font-bold tracking-tight">TaskFlow</h1>
+          <p class="text-xs text-slate-500">Gestión de tareas</p>
+        </div>
+      </div>
+
+      <nav class="space-y-2">
+        <a href="#inicio" class="flex items-center gap-3 rounded-xl bg-indigo-50 px-4 py-3 font-semibold text-indigo-700">
+          <span>▦</span>
+          Panel principal
+        </a>
+        <a href="#tareas" class="flex items-center gap-3 rounded-xl px-4 py-3 text-slate-600 transition hover:bg-slate-100">
+          <span>☑</span>
+          Mis tareas
+        </a>
+      </nav>
+
+      <div class="mt-10 rounded-2xl bg-slate-50 p-4">
+        <p class="text-sm font-semibold">TaskFlow</p>
+        <p class="mt-1 text-xs leading-5 text-slate-500">Organiza tus actividades y controla su progreso.</p>
+      </div>
+    </aside>
+
+    <main id="inicio" class="min-w-0 flex-1 p-4 sm:p-6 lg:p-10">
+      <header class="mb-8 flex flex-wrap items-center justify-between gap-4">
+        <div>
+          <p class="text-sm font-medium text-indigo-600">Espacio de trabajo</p>
+          <h2 class="mt-1 text-2xl font-bold tracking-tight sm:text-3xl">Panel principal</h2>
+          <p class="mt-2 text-sm text-slate-500">Administra tus tareas desde un solo lugar.</p>
+        </div>
+
+        <button
+          type="button"
+          (click)="checkConnections(); loadTasks()"
+          class="rounded-xl border border-slate-200 bg-white px-4 py-2.5 text-sm font-semibold shadow-sm transition hover:bg-slate-100">
+          Actualizar datos
+        </button>
+      </header>
+
+      <section class="mb-8 grid gap-4 sm:grid-cols-2">
+        <article class="rounded-2xl border border-slate-200 bg-white p-5 shadow-sm">
+          <div class="flex items-center justify-between gap-3">
+            <div>
+              <p class="text-sm text-slate-500">Servidor backend</p>
+              <p class="mt-2 text-lg font-bold">{{ backendStatus() }}</p>
+            </div>
+            <span
+              class="h-3 w-3 rounded-full"
+              [class.bg-emerald-500]="backendConnected()"
+              [class.bg-rose-500]="!backendConnected()">
+            </span>
+          </div>
+          <p class="mt-2 text-xs text-slate-400">API Express · Puerto 3000</p>
+        </article>
+
+        <article class="rounded-2xl border border-slate-200 bg-white p-5 shadow-sm">
+          <div class="flex items-center justify-between gap-3">
+            <div>
+              <p class="text-sm text-slate-500">Base de datos</p>
+              <p class="mt-2 text-lg font-bold">{{ databaseStatus() }}</p>
+            </div>
+            <span
+              class="h-3 w-3 rounded-full"
+              [class.bg-emerald-500]="databaseConnected()"
+              [class.bg-rose-500]="!databaseConnected()">
+            </span>
+          </div>
+          <p class="mt-2 text-xs text-slate-400">PostgreSQL · Base taskflow</p>
+        </article>
+      </section>
+
+      <section class="mb-8 grid grid-cols-1 gap-4 sm:grid-cols-3">
+        <article class="rounded-2xl bg-indigo-600 p-5 text-white shadow-sm">
+          <p class="text-sm text-indigo-100">Total de tareas</p>
+          <p class="mt-3 text-3xl font-bold">{{ tasks().length }}</p>
+        </article>
+        <article class="rounded-2xl border border-slate-200 bg-white p-5 shadow-sm">
+          <p class="text-sm text-slate-500">Pendientes / en progreso</p>
+          <p class="mt-3 text-3xl font-bold">{{ tasks().filter(t => t.estado !== 'completada').length }}</p>
+        </article>
+        <article class="rounded-2xl border border-slate-200 bg-white p-5 shadow-sm">
+          <p class="text-sm text-slate-500">Completadas</p>
+          <p class="mt-3 text-3xl font-bold">{{ tasks().filter(t => t.estado === 'completada').length }}</p>
+        </article>
+      </section>
+
+      @if (errorMessage()) {
+        <div role="alert" class="mb-5 rounded-xl border border-rose-200 bg-rose-50 px-4 py-3 text-sm text-rose-700">
+          {{ errorMessage() }}
+        </div>
+      }
+
+      @if (successMessage()) {
+        <div role="status" class="mb-5 rounded-xl border border-emerald-200 bg-emerald-50 px-4 py-3 text-sm text-emerald-700">
+          {{ successMessage() }}
+        </div>
+      }
+
+      <section class="mb-8 rounded-2xl border border-slate-200 bg-white p-5 shadow-sm sm:p-7">
+        <div class="mb-6">
+          <h3 class="text-lg font-bold">{{ editingTaskId() !== null ? 'Editar tarea' : 'Crear nueva tarea' }}</h3>
+          <p class="mt-1 text-sm text-slate-500">Completa los datos de la actividad.</p>
+        </div>
+
+        <form (ngSubmit)="saveTask()" class="grid gap-5 md:grid-cols-2">
+          <div class="md:col-span-2">
+            <label for="titulo" class="mb-2 block text-sm font-semibold">Título *</label>
+            <input
+              id="titulo"
+              name="titulo"
+              type="text"
+              maxlength="150"
+              required
+              [(ngModel)]="form.titulo"
+              placeholder="Ej. Preparar informe del proyecto"
+              class="w-full rounded-xl border border-slate-300 px-4 py-3 outline-none transition focus:border-indigo-500 focus:ring-2 focus:ring-indigo-100">
+          </div>
+
+          <div class="md:col-span-2">
+            <label for="descripcion" class="mb-2 block text-sm font-semibold">Descripción</label>
+            <textarea
+              id="descripcion"
+              name="descripcion"
+              rows="3"
+              [(ngModel)]="form.descripcion"
+              placeholder="Detalles de la tarea (opcional)"
+              class="w-full resize-y rounded-xl border border-slate-300 px-4 py-3 outline-none transition focus:border-indigo-500 focus:ring-2 focus:ring-indigo-100">
+            </textarea>
+          </div>
+
+          <div>
+            <label for="prioridad" class="mb-2 block text-sm font-semibold">Prioridad</label>
+            <select
+              id="prioridad"
+              name="prioridad"
+              [(ngModel)]="form.prioridad"
+              class="w-full rounded-xl border border-slate-300 bg-white px-4 py-3 outline-none focus:border-indigo-500 focus:ring-2 focus:ring-indigo-100">
+              @for (priority of priorities; track priority) {
+                <option [value]="priority">{{ priority | titlecase }}</option>
+              }
+            </select>
+          </div>
+
+          <div>
+            <label for="estado" class="mb-2 block text-sm font-semibold">Estado</label>
+            <select
+              id="estado"
+              name="estado"
+              [(ngModel)]="form.estado"
+              class="w-full rounded-xl border border-slate-300 bg-white px-4 py-3 outline-none focus:border-indigo-500 focus:ring-2 focus:ring-indigo-100">
+              @for (status of statuses; track status) {
+                <option [value]="status">{{ status | titlecase }}</option>
+              }
+            </select>
+          </div>
+
+          <div>
+            <label for="fecha_vencimiento" class="mb-2 block text-sm font-semibold">Fecha de vencimiento</label>
+            <input
+              id="fecha_vencimiento"
+              name="fecha_vencimiento"
+              type="date"
+              [(ngModel)]="form.fecha_vencimiento"
+              class="w-full rounded-xl border border-slate-300 bg-white px-4 py-3 outline-none focus:border-indigo-500 focus:ring-2 focus:ring-indigo-100">
+          </div>
+
+          <div class="flex flex-wrap items-end gap-3">
+            <button
+              type="submit"
+              [disabled]="savingTask()"
+              class="rounded-xl bg-indigo-600 px-5 py-3 text-sm font-semibold text-white shadow-sm transition hover:bg-indigo-700 disabled:cursor-not-allowed disabled:opacity-60">
+              {{ savingTask() ? 'Guardando...' : editingTaskId() !== null ? 'Guardar cambios' : 'Crear tarea' }}
+            </button>
+
+            @if (editingTaskId() !== null) {
+              <button
+                type="button"
+                (click)="cancelEdit()"
+                class="rounded-xl border border-slate-300 px-5 py-3 text-sm font-semibold text-slate-600 transition hover:bg-slate-50">
+                Cancelar
+              </button>
+            }
+          </div>
+        </form>
+      </section>
+
+      <section id="tareas" class="rounded-2xl border border-slate-200 bg-white p-5 shadow-sm sm:p-7">
+        <div class="mb-6 flex flex-wrap items-center justify-between gap-3">
+          <div>
+            <h3 class="text-lg font-bold">Mis tareas</h3>
+            <p class="mt-1 text-sm text-slate-500">Actividades guardadas en PostgreSQL.</p>
+          </div>
+          <button
+            type="button"
+            (click)="loadTasks()"
+            [disabled]="loadingTasks()"
+            class="rounded-xl border border-slate-200 px-4 py-2 text-sm font-semibold transition hover:bg-slate-50 disabled:opacity-60">
+            {{ loadingTasks() ? 'Cargando...' : 'Recargar lista' }}
+          </button>
+        </div>
+
+        @if (loadingTasks()) {
+          <p class="py-8 text-center text-sm text-slate-500">Cargando tareas...</p>
+        } @else if (tasks().length === 0) {
+          <div class="rounded-xl border border-dashed border-slate-300 px-5 py-10 text-center">
+            <p class="font-semibold text-slate-700">Todavía no tienes tareas</p>
+            <p class="mt-2 text-sm text-slate-500">Usa el formulario para registrar tu primera actividad.</p>
+          </div>
+        } @else {
+          <div class="space-y-4">
+            @for (task of tasks(); track trackTask($index, task)) {
+              <article class="rounded-xl border border-slate-200 p-4 transition hover:border-indigo-200 sm:p-5">
+                <div class="flex flex-col gap-4 lg:flex-row lg:items-start lg:justify-between">
+                  <div class="min-w-0 flex-1">
+                    <div class="flex flex-wrap items-center gap-2">
+                      <h4 class="break-words font-bold" [class.line-through]="task.estado === 'completada'" [class.text-slate-400]="task.estado === 'completada'">
+                        {{ task.titulo }}
+                      </h4>
+                      <span
+                        class="rounded-full px-2.5 py-1 text-xs font-semibold"
+                        [class.bg-rose-100]="task.prioridad === 'alta'"
+                        [class.text-rose-700]="task.prioridad === 'alta'"
+                        [class.bg-amber-100]="task.prioridad === 'media'"
+                        [class.text-amber-700]="task.prioridad === 'media'"
+                        [class.bg-slate-100]="task.prioridad === 'baja'"
+                        [class.text-slate-600]="task.prioridad === 'baja'">
+                        {{ task.prioridad | titlecase }}
+                      </span>
+                      <span class="rounded-full bg-indigo-50 px-2.5 py-1 text-xs font-semibold text-indigo-700">
+                        {{ task.estado | titlecase }}
+                      </span>
+                    </div>
+
+                    @if (task.descripcion) {
+                      <p class="mt-2 whitespace-pre-wrap break-words text-sm leading-6 text-slate-600">{{ task.descripcion }}</p>
+                    }
+
+                    <p class="mt-3 text-xs text-slate-400">
+                      Vencimiento: {{ task.fecha_vencimiento || 'Sin fecha' }}
+                    </p>
+                  </div>
+
+                  <div class="flex flex-wrap gap-2">
+                    <button
+                      type="button"
+                      (click)="changeStatus(task)"
+                      class="rounded-lg border border-slate-200 px-3 py-2 text-xs font-semibold transition hover:bg-slate-50">
+                      {{ task.estado === 'completada' ? 'Reabrir' : 'Completar' }}
+                    </button>
+                    <button
+                      type="button"
+                      (click)="startEdit(task)"
+                      class="rounded-lg border border-indigo-200 px-3 py-2 text-xs font-semibold text-indigo-700 transition hover:bg-indigo-50">
+                      Editar
+                    </button>
+                    <button
+                      type="button"
+                      (click)="deleteTask(task)"
+                      class="rounded-lg border border-rose-200 px-3 py-2 text-xs font-semibold text-rose-700 transition hover:bg-rose-50">
+                      Eliminar
+                    </button>
+                  </div>
+                </div>
+              </article>
+            }
+          </div>
+        }
+      </section>
+
+      <footer class="py-8 text-center text-xs text-slate-400">
+        TaskFlow · Gestión organizada de tareas
+      </footer>
+    </main>
+  </div>
+</div>
+
+<router-outlet />
