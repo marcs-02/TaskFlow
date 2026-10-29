@@ -35,6 +35,9 @@ jobs:
       - name: Compilar frontend
         run: npm run build
 
+      - name: Ejecutar pruebas del frontend
+        run: npm test -- --watch=false
+
   build-backend:
     name: Compilar backend TypeScript
     runs-on: ubuntu-latest
